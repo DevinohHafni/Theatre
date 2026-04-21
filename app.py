@@ -12,12 +12,14 @@ from mysql.connector import Error
 from datetime import date, datetime
 import decimal
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    import os
+    html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'index.html')
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
 
 # ──────────────────────────────────────────────
 # Database Configuration — update as needed
@@ -37,12 +39,19 @@ def get_connection():
 
 def serialize(row):
     """Convert MySQL row values to JSON-safe types."""
+    import datetime as dt
     result = {}
     for key, val in row.items():
         if isinstance(val, decimal.Decimal):
             result[key] = float(val)
         elif isinstance(val, (date, datetime)):
             result[key] = val.isoformat()
+        elif isinstance(val, dt.timedelta):
+            # MySQL TIME columns come back as timedelta
+            total_seconds = int(val.total_seconds())
+            hours, remainder = divmod(total_seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            result[key] = f'{hours:02d}:{minutes:02d}:{seconds:02d}'
         else:
             result[key] = val
     return result
