@@ -4,15 +4,20 @@ Run: python app.py
 Requires: pip install flask flask-cors mysql-connector-python
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
+import os
 import mysql.connector
 from mysql.connector import Error
 from datetime import date, datetime
 import decimal
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
+
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
 
 # ──────────────────────────────────────────────
 # Database Configuration — update as needed
@@ -20,7 +25,7 @@ CORS(app)
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '',          # ← change to your MySQL password
+    'password': '1234',          # ← change to your MySQL password
     'database': 'theater_db',
     'port': 3306
 }
