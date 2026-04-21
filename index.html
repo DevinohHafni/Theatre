@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineManager — Theater Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── CSS Variables ─────────────────────────────── */
+:root {
+  --bg:        #0a0a0f;
+  --surface:   #111118;
+  --card:      #16161f;
+  --border:    #242433;
+  --border2:   #2e2e42;
+  --gold:      #c9a84c;
+  --gold-dim:  #8a6d2a;
+  --gold-glow: rgba(201,168,76,0.15);
+  --red:       #e05555;
+  --green:     #4caf6e;
+  --blue:      #5588e0;
+  --text:      #e8e8f0;
+  --text2:     #9090b0;
+  --text3:     #5a5a78;
+  --radius:    10px;
+  --shadow:    0 4px 24px rgba(0,0,0,0.5);
+}
+
+/* ─── Reset & Base ──────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow-x: hidden;
+}
+
+/* ─── Sidebar ───────────────────────────────────── */
+#sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 100;
+  transition: transform .3s;
+}
+
+.sidebar-logo {
+  padding: 28px 20px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+.sidebar-logo span {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  display: block;
+  margin-top: 3px;
+}
+
+nav { flex: 1; padding: 16px 10px; }
+.nav-section {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 600;
+  padding: 14px 10px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: all .2s;
+  margin-bottom: 2px;
+  border: 1px solid transparent;
+}
+.nav-item:hover {
+  background: var(--card);
+  color: var(--text);
+}
+.nav-item.active {
+  background: var(--gold-glow);
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+/* ─── Main Content ──────────────────────────────── */
+#main {
+  margin-left: 220px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ─── Top bar ───────────────────────────────────── */
+#topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0; z-index: 50;
+}
+#topbar h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+}
+#topbar .actions { display: flex; gap: 10px; }
+
+/* ─── Page Content ──────────────────────────────── */
+#content {
+  padding: 28px 32px;
+  flex: 1;
+}
+
+/* ─── Buttons ───────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.btn-gold {
+  background: var(--gold);
+  color: #0a0a0f;
+}
+.btn-gold:hover { background: #d4b05e; transform: translateY(-1px); box-shadow: 0 4px 16px var(--gold-glow); }
+.btn-outline {
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border2);
+}
+.btn-outline:hover { border-color: var(--gold-dim); color: var(--gold); }
+.btn-danger { background: rgba(224,85,85,0.12); color: var(--red); border: 1px solid rgba(224,85,85,0.25); }
+.btn-danger:hover { background: rgba(224,85,85,0.22); }
+.btn-success { background: rgba(76,175,110,0.12); color: var(--green); border: 1px solid rgba(76,175,110,0.25); }
+.btn-success:hover { background: rgba(76,175,110,0.22); }
+.btn-sm { padding: 5px 11px; font-size: 0.76rem; }
+.btn-icon { padding: 7px 9px; }
+
+/* ─── Dashboard Stats ───────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  transition: border-color .2s;
+}
+.stat-card:hover { border-color: var(--gold-dim); }
+.stat-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-sub { font-size: 0.75rem; color: var(--text3); margin-top: 5px; }
+
+/* ─── Table ─────────────────────────────────────── */
+.table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.table-header h3 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 600;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
+.td-main { color: var(--text); font-weight: 500; }
+.td-actions { display: flex; gap: 6px; }
+
+/* ─── Badges ────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.badge-gold { background: rgba(201,168,76,0.15); color: var(--gold); }
+.badge-green { background: rgba(76,175,110,0.15); color: var(--green); }
+.badge-red { background: rgba(224,85,85,0.15); color: var(--red); }
+.badge-blue { background: rgba(85,136,224,0.15); color: var(--blue); }
+.badge-gray { background: rgba(144,144,176,0.12); color: var(--text3); }
+
+/* ─── Modal ─────────────────────────────────────── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: var(--shadow);
+  animation: slideIn .25s ease;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: color .2s;
+}
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 24px; }
+.modal-foot {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ─── Form Elements ─────────────────────────────── */
+.form-group { margin-bottom: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+input, select, textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  transition: border-color .2s;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 3px var(--gold-glow);
+}
+select option { background: var(--card); }
+textarea { resize: vertical; min-height: 72px; }
+
+/* ─── Search bar ────────────────────────────────── */
+.search-wrap { position: relative; }
+.search-wrap input { padding-left: 34px; }
+.search-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+/* ─── Toast ─────────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  animation: toastIn .3s ease;
+  min-width: 240px;
+  border: 1px solid;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: none; }
+}
+.toast-success { background: #0f2018; border-color: rgba(76,175,110,.35); color: var(--green); }
+.toast-error   { background: #200f0f; border-color: rgba(224,85,85,.35); color: var(--red); }
+.toast-info    { background: #0f1420; border-color: rgba(85,136,224,.35); color: var(--blue); }
+.toast-fade { opacity: 0; transition: opacity .4s; }
+
+/* ─── Empty state ───────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty p { font-size: 0.88rem; }
+
+/* ─── Loading spinner ───────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-row td {
+  text-align: center;
+  padding: 40px;
+  color: var(--text3);
+}
+
+/* ─── Mono text ─────────────────────────────────── */
+.mono { font-family: 'DM Mono', monospace; font-size: 0.78rem; }
+
+/* ─── Responsive ────────────────────────────────── */
+@media (max-width: 768px) {
+  #sidebar { transform: translateX(-100%); }
+  #sidebar.open { transform: none; }
+  #main { margin-left: 0; }
+  .form-row { grid-template-columns: 1fr; }
+  #content { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <h1>CineManager</h1>
+    <span>Theater System</span>
+  </div>
+  <nav>
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+      <span class="nav-icon">⬛</span> Dashboard
+    </div>
+
+    <div class="nav-section">Management</div>
+    <div class="nav-item" data-page="movies" onclick="navigate('movies')">
+      <span class="nav-icon">🎬</span> Movies
+    </div>
+    <div class="nav-item" data-page="theaters" onclick="navigate('theaters')">
+      <span class="nav-icon">🏛</span> Theaters
+    </div>
+    <div class="nav-item" data-page="shows" onclick="navigate('shows')">
+      <span class="nav-icon">🎭</span> Shows
+    </div>
+    <div class="nav-section">Sales</div>
+    <div class="nav-item" data-page="customers" onclick="navigate('customers')">
+      <span class="nav-icon">👤</span> Customers
+    </div>
+    <div class="nav-item" data-page="bookings" onclick="navigate('bookings')">
+      <span class="nav-icon">🎟</span> Bookings
+    </div>
+  </nav>
+</aside>
+
+<!-- ── Main ── -->
+<div id="main">
+  <header id="topbar">
+    <h2 id="page-title">Dashboard</h2>
+    <div class="actions" id="topbar-actions"></div>
+  </header>
+  <div id="content"></div>
+</div>
+
+<!-- ── Toast Container ── -->
+<div id="toast-container"></div>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Movie Modal -->
+<div class="overlay" id="movie-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="movie-modal-title">Add Movie</h3>
+      <button class="modal-close" onclick="closeModal('movie-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="movie-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="movie-title" placeholder="Movie title">
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <select id="movie-genre">
+            <option value="">Select genre</option>
+            <option>Action</option><option>Comedy</option><option>Drama</option>
+            <option>Horror</option><option>Romance</option><option>Sci-Fi</option>
+            <option>Thriller</option><option>Animation</option><option>Documentary</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Duration (mins) *</label>
+          <input type="number" id="movie-duration" placeholder="120" min="1">
+        </div>
+        <div class="form-group">
+          <label>Language</label>
+          <input type="text" id="movie-language" placeholder="English">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rating</label>
+          <select id="movie-rating">
+            <option value="">Select rating</option>
+            <option>U</option><option>UA</option><option>A</option>
+            <option>G</option><option>PG</option><option>PG-13</option><option>R</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="movie-desc" placeholder="Short description..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('movie-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveMovie()">Save Movie</button>
+    </div>
+  </div>
+</div>
+
+<!-- Theater Modal -->
+<div class="overlay" id="theater-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="theater-modal-title">Add Theater</h3>
+      <button class="modal-close" onclick="closeModal('theater-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="theater-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hall Name *</label>
+          <input type="text" id="theater-name" placeholder="Grand Hall">
+        </div>
+        <div class="form-group">
+          <label>Total Seats *</label>
+          <input type="number" id="theater-seats" placeholder="200" min="1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="theater-desc" placeholder="Hall description..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('theater-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveTheater()">Save Theater</button>
+    </div>
+  </div>
+</div>
+
+<!-- Show Modal -->
+<div class="overlay" id="show-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="show-modal-title">Add Show</h3>
+      <button class="modal-close" onclick="closeModal('show-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="show-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Movie *</label>
+          <select id="show-movie"></select>
+        </div>
+        <div class="form-group">
+          <label>Theater *</label>
+          <select id="show-theater"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Date *</label>
+          <input type="date" id="show-date">
+        </div>
+        <div class="form-group">
+          <label>Time *</label>
+          <input type="time" id="show-time">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ticket Price (₹) *</label>
+          <input type="number" id="show-price" placeholder="250" min="1">
+        </div>
+        <div class="form-group" id="show-status-group">
+          <label>Status</label>
+          <select id="show-status">
+            <option value="active">Active</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('show-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveShow()">Save Show</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="overlay" id="customer-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="customer-modal-title">Add Customer</h3>
+      <button class="modal-close" onclick="closeModal('customer-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="customer-id">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="customer-name" placeholder="Alice Johnson">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="customer-email" placeholder="alice@example.com">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="customer-phone" placeholder="+91 9876543210">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('customer-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveCustomer()">Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="overlay" id="booking-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>New Booking</h3>
+      <button class="modal-close" onclick="closeModal('booking-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Customer *</label>
+        <select id="booking-customer"></select>
+      </div>
+      <div class="form-group">
+        <label>Show *</label>
+        <select id="booking-show" onchange="updateBookingPrice()"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Number of Seats *</label>
+          <input type="number" id="booking-seats" value="1" min="1" oninput="updateBookingPrice()">
+        </div>
+        <div class="form-group">
+          <label>Total Amount</label>
+          <input type="text" id="booking-total" readonly placeholder="₹0.00" style="color:var(--gold);font-weight:600;">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('booking-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveBooking()">Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="overlay" id="confirm-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head">
+      <h3>Confirm Delete</h3>
+      <button class="modal-close" onclick="closeModal('confirm-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text2)" id="confirm-message">Are you sure?</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+
+/* ─────────────────────────────────────
+   ROUTING
+───────────────────────────────────── */
+function navigate(page) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  const titles = {
+    dashboard: 'Dashboard',
+    movies: 'Movies',
+    theaters: 'Theaters',
+    shows: 'Shows',
+    customers: 'Customers',
+    bookings: 'Bookings'
+  };
+  document.getElementById('page-title').textContent = titles[page];
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = '';
+  const pages = { dashboard, movies, theaters, shows, customers, bookings };
+  pages[page]();
+}
+
+/* ─────────────────────────────────────
+   API HELPERS
+───────────────────────────────────── */
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+/* ─────────────────────────────────────
+   TOAST
+───────────────────────────────────── */
+function toast(msg, type = 'success') {
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => { el.classList.add('toast-fade'); setTimeout(() => el.remove(), 400); }, 2800);
+}
+
+/* ─────────────────────────────────────
+   MODAL
+───────────────────────────────────── */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(el =>
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); })
+);
+
+/* ─────────────────────────────────────
+   CONFIRM
+───────────────────────────────────── */
+function confirmDelete(msg, cb) {
+  document.getElementById('confirm-message').textContent = msg;
+  const btn = document.getElementById('confirm-ok-btn');
+  btn.onclick = () => { closeModal('confirm-modal'); cb(); };
+  openModal('confirm-modal');
+}
+
+/* ─────────────────────────────────────
+   SEARCH HELPER
+───────────────────────────────────── */
+function filterTable(inputId, tbodyId) {
+  const q = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll(`#${tbodyId} tr`).forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+/* ─────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────── */
+async function dashboard() {
+  document.getElementById('content').innerHTML = `<div style="display:flex;align-items:center;gap:10px;color:var(--text3);padding:20px 0"><span class="spinner"></span> Loading stats...</div>`;
+  document.getElementById('topbar-actions').innerHTML = '';
+  try {
+    const s = await apiFetch('/stats');
+    document.getElementById('content').innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Movies</div>
+          <div class="stat-value">${s.total_movies}</div>
+          <div class="stat-sub">in catalog</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Theaters</div>
+          <div class="stat-value">${s.total_theaters}</div>
+          <div class="stat-sub">screening halls</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Shows</div>
+          <div class="stat-value">${s.active_shows}</div>
+          <div class="stat-sub">scheduled</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Customers</div>
+          <div class="stat-value">${s.total_customers}</div>
+          <div class="stat-sub">registered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bookings</div>
+          <div class="stat-value">${s.total_bookings}</div>
+          <div class="stat-sub">confirmed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Revenue</div>
+          <div class="stat-value" style="font-size:1.5rem">₹${s.total_revenue.toLocaleString('en-IN', {minimumFractionDigits:2})}</div>
+          <div class="stat-sub">total earned</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:4px">
+        <div class="table-wrap">
+          <div class="table-header"><h3>Quick Links</h3></div>
+          <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-gold" onclick="navigate('bookings');openNewBooking()" style="justify-content:center">🎟 New Booking</button>
+            <button class="btn btn-outline" onclick="navigate('movies')" style="justify-content:center">🎬 Add Movie</button>
+            <button class="btn btn-outline" onclick="navigate('shows')" style="justify-content:center">🎭 Schedule Show</button>
+            <button class="btn btn-outline" onclick="navigate('customers')" style="justify-content:center">👤 Add Customer</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>System Info</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;font-size:.83rem">
+              <span style="color:var(--text3)">Backend</span>
+              <span class="badge badge-green">Flask 3.x</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.83rem">
+              <span style="color:var(--text3)">Database</span>
+              <span class="badge badge-blue">MySQL</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.83rem">
+              <span style="color:var(--text3)">API</span>
+              <span class="badge badge-gold">REST / JSON</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.83rem">
+              <span style="color:var(--text3)">Frontend</span>
+              <span class="badge badge-gray">HTML / CSS / JS</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  } catch (e) {
+    document.getElementById('content').innerHTML = `<div class="empty"><div class="empty-icon">⚠</div><p>Cannot connect to backend. Make sure Flask is running on port 5000.</p></div>`;
+  }
+}
+
+/* ─────────────────────────────────────
+   MOVIES
+───────────────────────────────────── */
+async function movies() {
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `<button class="btn btn-gold" onclick="openMovieModal()">+ Add Movie</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>All Movies</h3>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search movies..." oninput="filterTable('movie-search','movie-tbody')" id="movie-search" style="width:200px">
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Title</th><th>Genre</th><th>Duration</th><th>Language</th><th>Rating</th><th>Actions</th></tr></thead>
+        <tbody id="movie-tbody"><tr class="loading-row"><td colspan="6"><span class="spinner"></span></td></tr></tbody>
+      </table>
+    </div>`;
+  await loadMovies();
+}
+
+async function loadMovies() {
+  try {
+    const data = await apiFetch('/movies');
+    const tbody = document.getElementById('movie-tbody');
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">🎬</div><p>No movies added yet.</p></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(m => `
+      <tr>
+        <td class="td-main">${m.title}</td>
+        <td>${m.genre ? `<span class="badge badge-blue">${m.genre}</span>` : '—'}</td>
+        <td>${m.duration_minutes} min</td>
+        <td>${m.language}</td>
+        <td>${m.rating ? `<span class="badge badge-gold">${m.rating}</span>` : '—'}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-outline btn-sm" onclick='openMovieModal(${JSON.stringify(m)})'>Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMovie(${m.id},'${escHtml(m.title)}')">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openMovieModal(m = null) {
+  document.getElementById('movie-modal-title').textContent = m ? 'Edit Movie' : 'Add Movie';
+  document.getElementById('movie-id').value = m ? m.id : '';
+  document.getElementById('movie-title').value = m ? m.title : '';
+  document.getElementById('movie-genre').value = m ? m.genre : '';
+  document.getElementById('movie-duration').value = m ? m.duration_minutes : '';
+  document.getElementById('movie-language').value = m ? m.language : 'English';
+  document.getElementById('movie-rating').value = m ? m.rating : '';
+  document.getElementById('movie-desc').value = m ? m.description : '';
+  openModal('movie-modal');
+}
+
+async function saveMovie() {
+  const id = document.getElementById('movie-id').value;
+  const body = {
+    title: document.getElementById('movie-title').value.trim(),
+    genre: document.getElementById('movie-genre').value,
+    duration_minutes: parseInt(document.getElementById('movie-duration').value),
+    language: document.getElementById('movie-language').value.trim() || 'English',
+    rating: document.getElementById('movie-rating').value,
+    description: document.getElementById('movie-desc').value.trim()
+  };
+  if (!body.title || !body.duration_minutes) { toast('Title and duration are required', 'error'); return; }
+  try {
+    if (id) await apiFetch(`/movies/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    else await apiFetch('/movies', { method: 'POST', body: JSON.stringify(body) });
+    toast(id ? 'Movie updated' : 'Movie added');
+    closeModal('movie-modal');
+    await loadMovies();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteMovie(id, name) {
+  confirmDelete(`Delete movie "${name}"? All associated shows will be removed.`, async () => {
+    try { await apiFetch(`/movies/${id}`, { method: 'DELETE' }); toast('Movie deleted'); await loadMovies(); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+}
+
+/* ─────────────────────────────────────
+   THEATERS
+───────────────────────────────────── */
+async function theaters() {
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-gold" onclick="openTheaterModal()">+ Add Theater</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>All Theaters</h3>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search..." oninput="filterTable('theater-search','theater-tbody')" id="theater-search" style="width:200px">
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Total Seats</th><th>Description</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="theater-tbody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span></td></tr></tbody>
+      </table>
+    </div>`;
+  await loadTheaters();
+}
+
+async function loadTheaters() {
+  try {
+    const data = await apiFetch('/theaters');
+    const tbody = document.getElementById('theater-tbody');
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🏛</div><p>No theaters added yet.</p></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(t => `
+      <tr>
+        <td class="td-main">${t.name}</td>
+        <td><span class="badge badge-gold">${t.total_seats}</span></td>
+        <td style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.description || '—'}</td>
+        <td class="mono">${t.created_at ? t.created_at.split('T')[0] : '—'}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-outline btn-sm" onclick='openTheaterModal(${JSON.stringify(t)})'>Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTheater(${t.id},'${escHtml(t.name)}')">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openTheaterModal(t = null) {
+  document.getElementById('theater-modal-title').textContent = t ? 'Edit Theater' : 'Add Theater';
+  document.getElementById('theater-id').value = t ? t.id : '';
+  document.getElementById('theater-name').value = t ? t.name : '';
+  document.getElementById('theater-seats').value = t ? t.total_seats : '';
+  document.getElementById('theater-desc').value = t ? t.description : '';
+  openModal('theater-modal');
+}
+
+async function saveTheater() {
+  const id = document.getElementById('theater-id').value;
+  const body = {
+    name: document.getElementById('theater-name').value.trim(),
+    total_seats: parseInt(document.getElementById('theater-seats').value),
+    description: document.getElementById('theater-desc').value.trim()
+  };
+  if (!body.name || !body.total_seats) { toast('Name and seats are required', 'error'); return; }
+  try {
+    if (id) await apiFetch(`/theaters/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    else await apiFetch('/theaters', { method: 'POST', body: JSON.stringify(body) });
+    toast(id ? 'Theater updated' : 'Theater added');
+    closeModal('theater-modal');
+    await loadTheaters();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteTheater(id, name) {
+  confirmDelete(`Delete theater "${name}"?`, async () => {
+    try { await apiFetch(`/theaters/${id}`, { method: 'DELETE' }); toast('Theater deleted'); await loadTheaters(); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+}
+
+/* ─────────────────────────────────────
+   SHOWS
+───────────────────────────────────── */
+async function shows() {
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-gold" onclick="openShowModal()">+ Add Show</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>All Shows</h3>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search..." oninput="filterTable('show-search','show-tbody')" id="show-search" style="width:200px">
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Movie</th><th>Theater</th><th>Date</th><th>Time</th><th>Price</th><th>Seats Left</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="show-tbody"><tr class="loading-row"><td colspan="8"><span class="spinner"></span></td></tr></tbody>
+      </table>
+    </div>`;
+  await loadShows();
+}
+
+async function loadShows() {
+  try {
+    const data = await apiFetch('/shows');
+    const tbody = document.getElementById('show-tbody');
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty"><div class="empty-icon">🎭</div><p>No shows scheduled.</p></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(s => {
+      const stBadge = { active: 'badge-green', cancelled: 'badge-red', completed: 'badge-gray' };
+      return `<tr>
+        <td class="td-main">${s.movie_title}</td>
+        <td>${s.theater_name}</td>
+        <td class="mono">${s.show_date}</td>
+        <td class="mono">${s.show_time}</td>
+        <td class="mono">₹${parseFloat(s.ticket_price).toFixed(2)}</td>
+        <td><span class="badge ${s.available_seats > 0 ? 'badge-gold' : 'badge-red'}">${s.available_seats}</span></td>
+        <td><span class="badge ${stBadge[s.status] || 'badge-gray'}">${s.status}</span></td>
+        <td><div class="td-actions">
+          <button class="btn btn-outline btn-sm" onclick='openShowModal(${JSON.stringify(s)})'>Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteShow(${s.id})">Delete</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function openShowModal(s = null) {
+  document.getElementById('show-modal-title').textContent = s ? 'Edit Show' : 'Add Show';
+  document.getElementById('show-id').value = s ? s.id : '';
+  // Load dropdowns
+  const [movs, thrs] = await Promise.all([apiFetch('/movies'), apiFetch('/theaters')]);
+  document.getElementById('show-movie').innerHTML = movs.map(m => `<option value="${m.id}" ${s && s.movie_id === m.id ? 'selected' : ''}>${m.title}</option>`).join('');
+  document.getElementById('show-theater').innerHTML = thrs.map(t => `<option value="${t.id}" ${s && s.theater_id === t.id ? 'selected' : ''}>${t.name}</option>`).join('');
+  document.getElementById('show-date').value = s ? s.show_date : '';
+  document.getElementById('show-time').value = s ? s.show_time : '';
+  document.getElementById('show-price').value = s ? s.ticket_price : '';
+  document.getElementById('show-status').value = s ? s.status : 'active';
+  openModal('show-modal');
+}
+
+async function saveShow() {
+  const id = document.getElementById('show-id').value;
+  const body = {
+    movie_id: parseInt(document.getElementById('show-movie').value),
+    theater_id: parseInt(document.getElementById('show-theater').value),
+    show_date: document.getElementById('show-date').value,
+    show_time: document.getElementById('show-time').value,
+    ticket_price: parseFloat(document.getElementById('show-price').value),
+    status: document.getElementById('show-status').value
+  };
+  if (!body.show_date || !body.show_time || !body.ticket_price) { toast('Date, time, and price are required', 'error'); return; }
+  try {
+    if (id) await apiFetch(`/shows/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    else await apiFetch('/shows', { method: 'POST', body: JSON.stringify(body) });
+    toast(id ? 'Show updated' : 'Show created');
+    closeModal('show-modal');
+    await loadShows();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteShow(id) {
+  confirmDelete('Delete this show? All bookings will be removed.', async () => {
+    try { await apiFetch(`/shows/${id}`, { method: 'DELETE' }); toast('Show deleted'); await loadShows(); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+}
+
+/* ─────────────────────────────────────
+   CUSTOMERS
+───────────────────────────────────── */
+async function customers() {
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-gold" onclick="openCustomerModal()">+ Add Customer</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>All Customers</h3>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search..." oninput="filterTable('cust-search','cust-tbody')" id="cust-search" style="width:200px">
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></tr></thead>
+        <tbody id="cust-tbody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span></td></tr></tbody>
+      </table>
+    </div>`;
+  await loadCustomers();
+}
+
+async function loadCustomers() {
+  try {
+    const data = await apiFetch('/customers');
+    const tbody = document.getElementById('cust-tbody');
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">👤</div><p>No customers yet.</p></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(c => `
+      <tr>
+        <td class="td-main">${c.name}</td>
+        <td class="mono" style="font-size:.78rem">${c.email}</td>
+        <td>${c.phone || '—'}</td>
+        <td class="mono">${c.created_at ? c.created_at.split('T')[0] : '—'}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-outline btn-sm" onclick='openCustomerModal(${JSON.stringify(c)})'>Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCustomer(${c.id},'${escHtml(c.name)}')">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function openCustomerModal(c = null) {
+  document.getElementById('customer-modal-title').textContent = c ? 'Edit Customer' : 'Add Customer';
+  document.getElementById('customer-id').value = c ? c.id : '';
+  document.getElementById('customer-name').value = c ? c.name : '';
+  document.getElementById('customer-email').value = c ? c.email : '';
+  document.getElementById('customer-phone').value = c ? c.phone : '';
+  openModal('customer-modal');
+}
+
+async function saveCustomer() {
+  const id = document.getElementById('customer-id').value;
+  const body = {
+    name: document.getElementById('customer-name').value.trim(),
+    email: document.getElementById('customer-email').value.trim(),
+    phone: document.getElementById('customer-phone').value.trim()
+  };
+  if (!body.name || !body.email) { toast('Name and email are required', 'error'); return; }
+  try {
+    if (id) await apiFetch(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    else await apiFetch('/customers', { method: 'POST', body: JSON.stringify(body) });
+    toast(id ? 'Customer updated' : 'Customer added');
+    closeModal('customer-modal');
+    await loadCustomers();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function deleteCustomer(id, name) {
+  confirmDelete(`Delete customer "${name}"?`, async () => {
+    try { await apiFetch(`/customers/${id}`, { method: 'DELETE' }); toast('Customer deleted'); await loadCustomers(); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+}
+
+/* ─────────────────────────────────────
+   BOOKINGS
+───────────────────────────────────── */
+async function bookings() {
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-gold" onclick="openNewBooking()">+ New Booking</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>All Bookings</h3>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search..." oninput="filterTable('booking-search','booking-tbody')" id="booking-search" style="width:200px">
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>#</th><th>Customer</th><th>Movie</th><th>Theater</th><th>Date/Time</th><th>Seats</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="booking-tbody"><tr class="loading-row"><td colspan="9"><span class="spinner"></span></td></tr></tbody>
+      </table>
+    </div>`;
+  await loadBookings();
+}
+
+async function loadBookings() {
+  try {
+    const data = await apiFetch('/bookings');
+    const tbody = document.getElementById('booking-tbody');
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="9"><div class="empty"><div class="empty-icon">🎟</div><p>No bookings yet.</p></div></td></tr>`; return; }
+    tbody.innerHTML = data.map(b => `
+      <tr>
+        <td class="mono" style="color:var(--text3)">#${b.id}</td>
+        <td class="td-main">${b.customer_name}</td>
+        <td>${b.movie_title}</td>
+        <td>${b.theater_name}</td>
+        <td class="mono" style="font-size:.75rem">${b.show_date} ${b.show_time}</td>
+        <td><span class="badge badge-gold">${b.num_seats}</span></td>
+        <td class="mono">₹${parseFloat(b.total_amount).toFixed(2)}</td>
+        <td><span class="badge ${b.booking_status === 'confirmed' ? 'badge-green' : 'badge-red'}">${b.booking_status}</span></td>
+        <td><div class="td-actions">
+          ${b.booking_status === 'confirmed' ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${b.id})">Cancel</button>` : ''}
+          <button class="btn btn-outline btn-sm" onclick="deleteBooking(${b.id})">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+let showsList = [];
+
+async function openNewBooking() {
+  const [custs, shws] = await Promise.all([apiFetch('/customers'), apiFetch('/shows')]);
+  showsList = shws.filter(s => s.status === 'active' && s.available_seats > 0);
+  document.getElementById('booking-customer').innerHTML =
+    custs.map(c => `<option value="${c.id}">${c.name} (${c.email})</option>`).join('');
+  document.getElementById('booking-show').innerHTML =
+    showsList.map(s => `<option value="${s.id}" data-price="${s.ticket_price}">${s.movie_title} — ${s.theater_name} — ${s.show_date} ${s.show_time} (${s.available_seats} left)</option>`).join('');
+  document.getElementById('booking-seats').value = 1;
+  updateBookingPrice();
+  openModal('booking-modal');
+}
+
+function updateBookingPrice() {
+  const sel = document.getElementById('booking-show');
+  if (!sel.options.length) return;
+  const price = parseFloat(sel.options[sel.selectedIndex]?.dataset.price || 0);
+  const seats = parseInt(document.getElementById('booking-seats').value) || 0;
+  document.getElementById('booking-total').value = `₹${(price * seats).toFixed(2)}`;
+}
+
+async function saveBooking() {
+  const body = {
+    show_id: parseInt(document.getElementById('booking-show').value),
+    customer_id: parseInt(document.getElementById('booking-customer').value),
+    num_seats: parseInt(document.getElementById('booking-seats').value)
+  };
+  if (!body.num_seats || body.num_seats < 1) { toast('Enter at least 1 seat', 'error'); return; }
+  try {
+    const res = await apiFetch('/bookings', { method: 'POST', body: JSON.stringify(body) });
+    toast(`Booking confirmed! Total: ₹${res.total_amount.toFixed(2)}`);
+    closeModal('booking-modal');
+    if (document.getElementById('booking-tbody')) await loadBookings();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+async function cancelBooking(id) {
+  confirmDelete('Cancel this booking? Seats will be restored.', async () => {
+    try { await apiFetch(`/bookings/${id}/cancel`, { method: 'PUT' }); toast('Booking cancelled', 'info'); await loadBookings(); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+}
+
+async function deleteBooking(id) {
+  confirmDelete('Delete this booking record?', async () => {
+    try { await apiFetch(`/bookings/${id}`, { method: 'DELETE' }); toast('Booking deleted'); await loadBookings(); }
+    catch (e) { toast(e.message, 'error'); }
+  });
+}
+
+/* ─────────────────────────────────────
+   UTILS
+───────────────────────────────────── */
+function escHtml(str) {
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+/* ─────────────────────────────────────
+   INIT
+───────────────────────────────────── */
+navigate('dashboard');
+</script>
+</body>
+</html>
